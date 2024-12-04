@@ -44,7 +44,8 @@ BEGIN
 END;
 /
 
-//Trigger 3  billing amount cant exceed more than individual prices CREATE OR REPLACE TRIGGER validate_billing_total
+//Trigger 3  billing amount cant exceed more than individual prices
+CREATE OR REPLACE TRIGGER validate_billing_total
 BEFORE INSERT OR UPDATE ON "PCM.BILLING"
 FOR EACH ROW
 DECLARE
@@ -63,6 +64,47 @@ BEGIN
     -- Validate that the total_amount does not exceed the calculated total
     IF :NEW.total_amount > calculated_total THEN
         RAISE_APPLICATION_ERROR(-20003, 'Total billing amount exceeds the sum of individual charges!');
+    END IF;
+END;
+/
+
+//Trigger 4  cant prescribe expired medication 
+CREATE OR REPLACE TRIGGER enforce_medication_expiry
+BEFORE INSERT ON "PCM.PRESCRIPTION"
+FOR EACH ROW
+DECLARE
+    expiration_date DATE;
+BEGIN
+    -- Retrieve the expiration date of the prescribed medication
+    SELECT expiration_date
+    INTO expiration_date
+    FROM "PCM.MEDICATION"
+    WHERE medication_id = :NEW.medication_id;
+
+    -- Check if the medication is expired
+    IF expiration_date < SYSDATE THEN
+        RAISE_APPLICATION_ERROR(-20004, 'Cannot prescribe expired medication!');
+    END IF;
+END;
+/
+
+
+//Trigger 5 valid primary doctor is assigned to patient
+CREATE OR REPLACE TRIGGER validate_primary_doctor
+BEFORE INSERT OR UPDATE ON "PCM.PATIENT"
+FOR EACH ROW
+DECLARE
+    doctor_exists NUMBER;
+BEGIN
+    -- Check if the primary doctor exists in the DOCTOR table
+    SELECT COUNT(*)
+    INTO doctor_exists
+    FROM "PCM.DOCTOR"
+    WHERE doctor_id = :NEW.primary_doctor_id;
+
+    -- Raise an error if the primary doctor does not exist
+    IF doctor_exists = 0 THEN
+        RAISE_APPLICATION_ERROR(-20007, 'Primary doctor does not exist!');
     END IF;
 END;
 /
