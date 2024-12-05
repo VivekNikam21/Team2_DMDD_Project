@@ -95,6 +95,7 @@ CREATE OR REPLACE PACKAGE appointment_pkg IS
         p_doctor_id NUMBER,
         p_status VARCHAR2,
         p_treatment_plan varchar2,
+        p_cancellation_reason varchar2, 
         p_follow_up_appointment_id number
     );
 
@@ -119,6 +120,7 @@ CREATE OR REPLACE PACKAGE BODY appointment_pkg IS
         p_doctor_id NUMBER,
         p_status VARCHAR2,
         p_treatment_plan varchar2,
+        p_cancellation_reason varchar2, 
         p_follow_up_appointment_id number
     )
     IS
@@ -129,8 +131,8 @@ CREATE OR REPLACE PACKAGE BODY appointment_pkg IS
         ELSE
             -- Insert appointment details into the APPOINTMENT table
             INSERT INTO "PCM.APPOINTMENT"
-            (appointment_id, scheduled_date, scheduled_time, patient_id, doctor_id, status, treatment_plan, follow_up_appointment_id)
-            VALUES (p_appointment_id, p_scheduled_date, p_scheduled_time, p_patient_id, p_doctor_id, p_status, p_treatment_plan, p_follow_up_appointment_id);
+            (appointment_id, scheduled_date, scheduled_time, patient_id, doctor_id, status, treatment_plan, cancellation_reason, follow_up_appointment_id)
+            VALUES (p_appointment_id, p_scheduled_date, p_scheduled_time, p_patient_id, p_doctor_id, p_status, p_treatment_plan, p_cancellation_reason, p_follow_up_appointment_id);
             
             COMMIT;
             DBMS_OUTPUT.PUT_LINE('Appointment Scheduled Successfully');
