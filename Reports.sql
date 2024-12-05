@@ -114,5 +114,32 @@ SELECT
 FROM 
     "PCM.APPOINTMENT" a; 
     
--------------------------------------------------------------------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------------------------------------------------------------------  
+---Report - 5 - Doctor Performance Overview Report--
+
+
+
+SELECT 
+    d.doctor_id,
+    d.first_name || ' ' || d.last_name AS doctor_name,
+    COUNT(a.appointment_id) AS total_appointments,
+    COUNT(CASE WHEN a.status = 'completed' THEN 1 END) AS completed_appointments,
+    COUNT(CASE WHEN a.status = 'scheduled' THEN 1 END) AS upcoming_appointments,
+    COUNT(CASE WHEN a.status = 'canceled' THEN 1 END) AS canceled_appointments,
+    COUNT(DISTINCT p.patient_id) AS unique_patients_treated,
+    MAX(a.scheduled_date) AS last_appointment_date
+FROM 
+    "PCM.DOCTOR" d
+LEFT JOIN 
+    "PCM.APPOINTMENT" a ON d.doctor_id = a.doctor_id
+LEFT JOIN 
+    "PCM.PATIENT" p ON a.patient_id = p.patient_id
+GROUP BY 
+    d.doctor_id, d.first_name, d.last_name
+ORDER BY 
+    total_appointments DESC
+FETCH FIRST 10 ROWS ONLY;
+
+
+
 
