@@ -77,6 +77,12 @@ CREATE OR REPLACE PACKAGE BODY patient_pkg IS
 END patient_pkg;
 /
 
+<<<<<<< HEAD
+=======
+
+
+-- 2 Appoint management schedule and check if app exists
+>>>>>>> a6d2e58a8e6071796406166c27c21d402cd2c043
 
 
 
@@ -224,23 +230,41 @@ END billing_pkg;
 /
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> a6d2e58a8e6071796406166c27c21d402cd2c043
 -- 4 Prescription Management
 
 CREATE OR REPLACE PACKAGE prescription_mgmt_pkg IS
     -- Procedure to create a new prescription
     PROCEDURE create_prescription (
+<<<<<<< HEAD
         p_prescription_order_id NUMBER,
         p_quantity NUMBER,
         p_cost NUMBER,
         p_prescription_id NUMBER,
         p_medication_id NUMBER        
+=======
+        p_prescription_order_id IN NUMBER,
+        p_quantity IN NUMBER,
+        p_cost IN NUMBER,
+        p_medication_id IN NUMBER,
+        p_patient_id IN NUMBER
+>>>>>>> a6d2e58a8e6071796406166c27c21d402cd2c043
     );
 
     -- Function to check if a medication is available in stock
     FUNCTION is_medication_available (
+<<<<<<< HEAD
         p_medication_id NUMBER,
         p_quantity NUMBER
     ) RETURN NUMBER;
+=======
+        p_medication_id IN NUMBER,
+        p_quantity IN NUMBER
+    ) RETURN BOOLEAN;
+>>>>>>> a6d2e58a8e6071796406166c27c21d402cd2c043
 END prescription_mgmt_pkg;
 /
 
@@ -250,15 +274,24 @@ CREATE OR REPLACE PACKAGE BODY prescription_mgmt_pkg IS
 
     -- Implementation of create_prescription procedure
     PROCEDURE create_prescription (
+<<<<<<< HEAD
        p_prescription_order_id NUMBER,
         p_quantity NUMBER,
         p_cost NUMBER,
         p_prescription_id NUMBER,
         p_medication_id NUMBER   
+=======
+        p_prescription_order_id IN NUMBER,
+        p_quantity IN NUMBER,
+        p_cost IN NUMBER,
+        p_medication_id IN NUMBER,
+        p_patient_id IN NUMBER
+>>>>>>> a6d2e58a8e6071796406166c27c21d402cd2c043
     )
     IS
     BEGIN
         -- Check if medication is available in stock
+<<<<<<< HEAD
         IF is_medication_available(p_medication_id, p_quantity)=1  THEN
             -- Insert prescription order into the PRESCRIPTION_ORDER table
             INSERT INTO "PCM.PRESCRIPTION_ORDER"
@@ -266,6 +299,13 @@ CREATE OR REPLACE PACKAGE BODY prescription_mgmt_pkg IS
             COST
             , prescription_id, medication_id)
             VALUES (p_prescription_order_id, p_quantity, p_cost, p_prescription_id, p_medication_id);
+=======
+        IF is_medication_available(p_medication_id, p_quantity) THEN
+            -- Insert prescription order into the PRESCRIPTION_ORDER table
+            INSERT INTO "PCM.PRESCRIPTION_ORDER"
+            (prescription_order_id, quantity, cost, prescription_id, medication_id)
+            VALUES (p_prescription_order_id, p_quantity, p_cost, p_patient_id, p_medication_id);
+>>>>>>> a6d2e58a8e6071796406166c27c21d402cd2c043
 
             -- Update medication stock level
             UPDATE "PCM.MEDICATION"
@@ -282,9 +322,15 @@ CREATE OR REPLACE PACKAGE BODY prescription_mgmt_pkg IS
 
     -- Implementation of is_medication_available function
     FUNCTION is_medication_available (
+<<<<<<< HEAD
         p_medication_id NUMBER,
         p_quantity NUMBER
     ) RETURN NUMBER
+=======
+        p_medication_id IN NUMBER,
+        p_quantity IN NUMBER
+    ) RETURN BOOLEAN
+>>>>>>> a6d2e58a8e6071796406166c27c21d402cd2c043
     IS
         v_stock_level NUMBER;
     BEGIN
@@ -296,9 +342,15 @@ CREATE OR REPLACE PACKAGE BODY prescription_mgmt_pkg IS
 
         -- Return TRUE if the stock level is sufficient, otherwise FALSE
         IF v_stock_level >= p_quantity THEN
+<<<<<<< HEAD
             RETURN 1;
         ELSE
             RETURN 0;
+=======
+            RETURN TRUE;
+        ELSE
+            RETURN FALSE;
+>>>>>>> a6d2e58a8e6071796406166c27c21d402cd2c043
         END IF;
     END is_medication_available;
 
