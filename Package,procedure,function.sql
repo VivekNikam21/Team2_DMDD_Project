@@ -73,6 +73,8 @@ CREATE OR REPLACE PACKAGE BODY patient_pkg IS
 END patient_pkg;
 /
 
+
+
 -- 2 Appoint management schedule and check if app exists
 
 CREATE OR REPLACE PACKAGE appointment_pkg IS
@@ -203,4 +205,85 @@ CREATE OR REPLACE PACKAGE BODY billing_pkg IS
     END check_payment_status;
 
 END billing_pkg;
+/
+
+
+
+-- 4 Prescription Management
+
+CREATE OR REPLACE PACKAGE prescription_mgmt_pkg IS
+    -- Procedure to create a new prescription
+    PROCEDURE create_prescription (
+        p_prescription_order_id IN NUMBER,
+        p_quantity IN NUMBER,
+        p_cost IN NUMBER,
+        p_medication_id IN NUMBER,
+        p_patient_id IN NUMBER
+    );
+
+    -- Function to check if a medication is available in stock
+    FUNCTION is_medication_available (
+        p_medication_id IN NUMBER,
+        p_quantity IN NUMBER
+    ) RETURN BOOLEAN;
+END prescription_mgmt_pkg;
+/
+
+-- PACKAGE BODY
+
+CREATE OR REPLACE PACKAGE BODY prescription_mgmt_pkg IS
+
+    -- Implementation of create_prescription procedure
+    PROCEDURE create_prescription (
+        p_prescription_order_id IN NUMBER,
+        p_quantity IN NUMBER,
+        p_cost IN NUMBER,
+        p_medication_id IN NUMBER,
+        p_patient_id IN NUMBER
+    )
+    IS
+    BEGIN
+        -- Check if medication is available in stock
+        IF is_medication_available(p_medication_id, p_quantity) THEN
+            -- Insert prescription order into the PRESCRIPTION_ORDER table
+            INSERT INTO "PCM.PRESCRIPTION_ORDER"
+            (prescription_order_id, quantity, cost, prescription_id, medication_id)
+            VALUES (p_prescription_order_id, p_quantity, p_cost, p_patient_id, p_medication_id);
+
+            -- Update medication stock level
+            UPDATE "PCM.MEDICATION"
+            SET stock_level = stock_level - p_quantity
+            WHERE medication_id = p_medication_id;
+
+            COMMIT;
+
+            DBMS_OUTPUT.PUT_LINE('Prescription Created Successfully');
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Error: Medication is out of stock');
+        END IF;
+    END create_prescription;
+
+    -- Implementation of is_medication_available function
+    FUNCTION is_medication_available (
+        p_medication_id IN NUMBER,
+        p_quantity IN NUMBER
+    ) RETURN BOOLEAN
+    IS
+        v_stock_level NUMBER;
+    BEGIN
+        -- Check the current stock level for the given medication
+        SELECT stock_level
+        INTO v_stock_level
+        FROM "PCM.MEDICATION"
+        WHERE medication_id = p_medication_id;
+
+        -- Return TRUE if the stock level is sufficient, otherwise FALSE
+        IF v_stock_level >= p_quantity THEN
+            RETURN TRUE;
+        ELSE
+            RETURN FALSE;
+        END IF;
+    END is_medication_available;
+
+END prescription_mgmt_pkg;
 /
